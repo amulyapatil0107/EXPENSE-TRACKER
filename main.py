@@ -19,51 +19,88 @@ def save_expenses(expenses):
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
+    expenses = get_expenses()
+    
     if request.method == 'POST':
-        # Get data from the form
         item_name = request.form.get('item')
         item_amount = request.form.get('amount')
+        item_desc = request.form.get('description', '')
         
-        # Save it
-        expenses = get_expenses()
-        expenses.append({"name": item_name, "amount": float(item_amount)})
+        # Add new entry
+        expenses.append({
+            "name": item_name, 
+            "amount": float(item_amount),
+            "description": item_desc,
+            "date": "2026-03-29" # You can use datetime here later!
+        })
         save_expenses(expenses)
         return redirect('/')
 
-    data = get_expenses()
-    table_rows = "".join([f"<tr><td>{ex.get('name', 'Item')}</td><td>₹{ex.get('amount')}</td></tr>" for ex in data])
+    # Calculate Total
+    total_spent = sum(item.get('amount', 0) for item in expenses)
+
+    table_rows = ""
+    for i, ex in enumerate(expenses):
+        table_rows += f"""
+        <tr>
+            <td>{ex.get('date', '-')}</td>
+            <td><b>{ex.get('name', 'Item')}</b><br><small>{ex.get('description', '')}</small></td>
+            <td>₹{ex.get('amount')}</td>
+            <td>
+                <form action="/delete/{i}" method="POST" style="margin:0;">
+                    <button type="submit" style="background:#ff4d4d; padding: 5px 8px; font-size: 11px;">Delete</button>
+                </form>
+            </td>
+        </tr>
+        """
 
     return render_template_string(f"""
     <html>
         <head>
-            <title>Expense Tracker</title>
+            <title>Expense Tracker Pro</title>
             <style>
-                body {{ font-family: sans-serif; background: #FF914D; text-align: center; padding: 20px; }}
-                .container {{ background: white; padding: 20px; border-radius: 15px; display: inline-block; width: 80%; max-width: 500px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }}
-                table {{ width: 100%; border-collapse: collapse; margin-bottom: 20px; }}
-                th, td {{ border-bottom: 1px solid #ddd; padding: 10px; }}
-                input {{ padding: 10px; margin: 5px; width: 80%; border-radius: 5px; border: 1px solid #ccc; }}
-                button {{ padding: 10px 20px; background: #333; color: white; border: none; border-radius: 5px; cursor: pointer; }}
+                body {{ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #FF914D; text-align: center; padding: 20px; }}
+                .container {{ background: white; padding: 25px; border-radius: 20px; display: inline-block; width: 95%; max-width: 700px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }}
+                table {{ width: 100%; border-collapse: collapse; margin-top: 20px; }}
+                th, td {{ border-bottom: 1px solid #eee; padding: 12px; text-align: left; }}
+                th {{ background: #f8f8f8; }}
+                .total-box {{ background: #333; color: white; padding: 15px; border-radius: 10px; margin: 20px 0; font-size: 1.2em; }}
+                input {{ padding: 10px; margin: 5px; border: 1px solid #ddd; border-radius: 8px; width: 30%; }}
+                .btn-add {{ background: #2ecc71; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }}
             </style>
         </head>
         <body>
             <div class="container">
-                <h1>💰 My Expenses</h1>
+                <h1>📊 Expense Dashboard</h1>
+                
+                <div class="total-box">
+                    Total Spent: <b>₹{total_spent}</b>
+                </div>
+
                 <table>
-                    <tr><th>Item</th><th>Amount</th></tr>
-                    {table_rows if table_rows else "<tr><td colspan='2'>No data</td></tr>"}
+                    <tr><th>Date</th><th>Item</th><th>Amount</th><th>Action</th></tr>
+                    {table_rows if table_rows else "<tr><td colspan='4'>No expenses recorded.</td></tr>"}
                 </table>
-                <hr>
-                <h3>Add New Expense</h3>
+
+                <h3 style="margin-top:30px;">Add New Transaction</h3>
                 <form method="POST">
-                    <input type="text" name="item" placeholder="Item name (e.g. Coffee)" required>
+                    <input type="text" name="item" placeholder="Item Name" required>
                     <input type="number" name="amount" placeholder="Amount (₹)" required>
-                    <button type="submit">Add Expense</button>
+                    <input type="text" name="description" placeholder="Notes (Optional)">
+                    <button type="submit" class="btn-add">Add Expense</button>
                 </form>
             </div>
         </body>
     </html>
     """)
+
+@app.route('/delete/<int:index>', methods=['POST'])
+def delete_expense(index):
+    expenses = get_expenses()
+    if 0 <= index < len(expenses):
+        expenses.pop(index)
+        save_expenses(expenses)
+    return redirect('/')
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
