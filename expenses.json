@@ -1,0 +1,16 @@
+[
+    {
+        "id": "fb6d18ad-16c0-42ae-8972-b3dda9279dc9",
+        "amount": 1000.0,
+        "category": "shopping",
+        "description": "zudio",
+        "date": "2026-03-25"
+    },
+    {
+        "id": "efac7b12-2f1f-44eb-90ad-ce4385a9f848",
+        "amount": 200.0,
+        "category": "MRC",
+        "description": "curd+bfast+schezwan rice",
+        "date": "2026-03-24"
+    }
+]
