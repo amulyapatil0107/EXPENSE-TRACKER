@@ -3,3 +3,4 @@ firebase-admin
 
 # Requirements for Expense Tracker
 # Now uses Flask for web frontend.
+flask
