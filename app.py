@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-from src.expense_tracker.cli import main
-
-if __name__ == "__main__":
-    main()
+from flask import Flask
+app = Flask(__name__)
+@app.route("/")
+def home():
+    return "Expense Tracker is Running"
