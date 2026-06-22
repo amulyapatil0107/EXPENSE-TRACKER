@@ -1,6 +1,6 @@
 # EXPENSE-TRACKER
 A project made by me as a 1st year student which actually helps people around the world especially college student like me.
-go and check it out https://project1-pied-nine.vercel.app/analytics
+go and check it out there https://project1-pied-nine.vercel.app/analytics
  # Features of this project
 
 - 🔐 User Authentication (Register & Login)
